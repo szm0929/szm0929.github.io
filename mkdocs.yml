@@ -50,6 +50,11 @@ nav:
     - computer_science/DD/index.md
     - 实验报告: computer_science/DD/reports/index.md
     - 历年期末卷: computer_science/DD/exam/index.md
+  - 高级数据结构与算法分析: 
+    - computer_science/ADS/index.md
+    - 课程笔记:
+      - computer_science/ADS/lecture/index.md
+      - AVL 与 Splay: computer_science/ADS/lecture/AVL_Splay/index.md
 - 思政类课程:
   - political/index.md
   - 思想道德与法治: 
