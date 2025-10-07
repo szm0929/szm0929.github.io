@@ -125,3 +125,296 @@ AVL 树是一种基于高度平衡的一种平衡树，其左右儿子的高度�
         return p;
     }
     ```
+### 删除
+删除过程也与常规二叉搜索树相同，即当儿子数量不为 $2$ 时直接删除，否则找到后继再删除。且删除完成后遇到的情况仍然是上述的四种情况之一，因此这里直接给出参考代码了。!mask[不知道为什么 AVL 树的删除不考，反而考红黑树的删除。]  
+??? 参考代码
+    ```cpp
+    tree del(tree p,int x){
+        if(!p)
+            return p;
+        if(x<p->val){
+            p->ls=del(p->ls,x);
+            if(getHB(p)<-1){
+                if(getHB(p->rs)>0)
+                    p->rs=rotR(p->rs);
+                p=rotL(p);
+            }
+        }
+        else if(x>p->val){
+            p->rs=del(p->rs,x);
+            if(getHB(p)>1){
+                if(getHB(p->ls)<0)
+                    p->ls=rotL(p->ls);
+                p=rotR(p);
+            }
+        }
+        else{
+            if(p->cnt>1){
+                --p->cnt;
+                upd(p);
+                return p;
+            }
+            if(!p->ls||!p->rs){
+                tree t=p;
+                if(!p->ls)
+                    p=p->rs;
+                else
+                    p=p->ls;
+                delete t;
+                return p;
+            }
+            else{
+                tree t=p->rs;
+                while(t->ls)
+                    t=t->ls;
+                p->val=t->val;
+                p->cnt=t->cnt;
+                t->cnt=1;
+                p->rs=del(p->rs,t->val);
+                if(getHB(p)>1){
+                    if(getHB(p->ls)<0)
+                        p->ls=rotL(p->ls);
+                    p=rotR(p);
+                }
+            }
+        }
+        upd(p);
+        return p;
+    }
+    ```
+### 拓展操作
+与常规二叉搜索树完全一致。
+
+至此，AVL 树已全部介绍完成，我将给出可以通过洛谷 P3369 的完整代码，有轻度封装。   
+??? 参考代码
+    ```cpp
+    #include<bits/stdc++.h>
+    using namespace std;
+    int read(){
+        int x=0,f=1;
+        char c=getchar();
+        while(!isdigit(c)){
+            if(c=='-')
+                f=-1;
+            c=getchar();
+        }
+        while(isdigit(c)){
+            x=x*10+f*(c-48);
+            c=getchar();
+        }
+        return x;
+    }
+    struct node;
+    typedef node* tree;
+    struct node{
+        int val,h,sz,cnt;
+        tree ls,rs;
+        node(int val=0,int h=1,int sz=1,int cnt=1,tree ls=0,tree rs=0):val(val),h(h),sz(sz),cnt(cnt),ls(ls),rs(rs){}
+    };
+    int getH(tree p){
+        if(!p)
+            return 0;
+        return p->h;
+    }
+    int getHB(tree p){
+        if(!p)
+            return 0;
+        return getH(p->ls)-getH(p->rs);
+    }
+    int getSize(tree p){
+        if(!p)
+            return 0;
+        return p->sz;
+    }
+    void upd(tree p){
+        if(!p)
+            return;
+        p->h=max(getH(p->ls),getH(p->rs))+1;
+        p->sz=getSize(p->ls)+getSize(p->rs)+p->cnt;
+    }
+    tree rotL(tree p){
+        tree x=p->rs;
+        p->rs=x->ls;
+        x->ls=p;
+        upd(p);
+        upd(x);
+        return x;
+    }
+    tree rotR(tree p){
+        tree x=p->ls;
+        p->ls=x->rs;
+        x->rs=p;
+        upd(p);
+        upd(x);
+        return x;
+    }
+    tree ins(tree p,int x){
+        if(!p)
+            return new node(x);
+        if(x<p->val){
+            p->ls=ins(p->ls,x);
+            if(getHB(p)>1){
+                if(getHB(p->ls)<0)
+                    p->ls=rotL(p->ls);
+                p=rotR(p);
+                return p;
+            }
+        }
+        else if(x>p->val){
+            p->rs=ins(p->rs,x);
+            if(getHB(p)<-1){
+                if(getHB(p->rs)>0)
+                    p->rs=rotR(p->rs);
+                p=rotL(p);
+                return p;
+            }
+        }
+        else
+            ++p->cnt;
+        upd(p);
+        return p;
+    }
+    tree del(tree p,int x){
+        if(!p)
+            return p;
+        if(x<p->val){
+            p->ls=del(p->ls,x);
+            if(getHB(p)<-1){
+                if(getHB(p->rs)>0)
+                    p->rs=rotR(p->rs);
+                p=rotL(p);
+            }
+        }
+        else if(x>p->val){
+            p->rs=del(p->rs,x);
+            if(getHB(p)>1){
+                if(getHB(p->ls)<0)
+                    p->ls=rotL(p->ls);
+                p=rotR(p);
+            }
+        }
+        else{
+            if(p->cnt>1){
+                --p->cnt;
+                upd(p);
+                return p;
+            }
+            if(!p->ls||!p->rs){
+                tree t=p;
+                if(!p->ls)
+                    p=p->rs;
+                else
+                    p=p->ls;
+                delete t;
+                return p;
+            }
+            else{
+                tree t=p->rs;
+                while(t->ls)
+                    t=t->ls;
+                p->val=t->val;
+                p->cnt=t->cnt;
+                t->cnt=1;
+                p->rs=del(p->rs,t->val);
+                if(getHB(p)>1){
+                    if(getHB(p->ls)<0)
+                        p->ls=rotL(p->ls);
+                    p=rotR(p);
+                }
+            }
+        }
+        upd(p);
+        return p;
+    }
+    int rnk(tree p,int x){
+        if(!p)
+            return 1;
+        if(x<p->val)
+            return rnk(p->ls,x);
+        if(x==p->val)
+            return getSize(p->ls)+1;
+        return getSize(p->ls)+p->cnt+rnk(p->rs,x);
+    }
+    int val(tree p,int k){
+        if(!p||k<=0||k>getSize(p))
+            return -1;
+        if(k<=getSize(p->ls))
+            return val(p->ls,k);
+        if(k<=getSize(p->ls)+p->cnt)
+            return p->val;
+        return val(p->rs,k-getSize(p->ls)-p->cnt);
+    }
+    int pre(tree p,int x){
+        if(!p)
+            return -1;
+        if(x<=p->val)
+            return pre(p->ls,x);
+        int t=pre(p->rs,x);
+        if(t==-1)
+            return p->val;
+        return t;
+    }
+    int suf(tree p,int x){
+        if(!p)
+            return -1;
+        if(x>=p->val)
+            return suf(p->rs,x);
+        int t=suf(p->ls,x);
+        if(t==-1)
+            return p->val;
+        return t;
+    }
+    struct AVL{
+        tree rt;
+        int root(){
+            if(!rt)
+                return -1;
+            return rt->val;
+        }
+        void insert(int x){
+            rt=ins(rt,x);
+        }
+        void erase(int x){
+            rt=del(rt,x);
+        }
+        int rank(int x){
+            return rnk(rt,x);
+        }
+        int kth(int k){
+            return val(rt,k);
+        }
+        int prev(int x){
+            return pre(rt,x);
+        }
+        int suff(int x){
+            return suf(rt,x);
+        }
+    };
+    AVL T;
+    int n,opt,x;
+    int main(){
+        #ifdef alarm5854
+        freopen("AVL.in","r",stdin);
+        freopen("AVL.out","w",stdout);
+        #endif
+        n=read();
+        for(int i=1;i<=n;++i){
+            opt=read();
+            x=read();
+            if(opt==1)
+                T.insert(x);
+            else if(opt==2)
+                T.erase(x);
+            else if(opt==3)
+                printf("%d\n",T.rank(x));
+            else if(opt==4)
+                printf("%d\n",T.kth(x));
+            else if(opt==5)
+                printf("%d\n",T.prev(x));
+            else
+                printf("%d\n",T.suff(x));
+        }
+        return 0;
+    }
+    ```
+!mask[这不比OIwiki给出的过度封装且长达904行的代码强多了]
