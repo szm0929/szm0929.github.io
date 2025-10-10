@@ -55,6 +55,7 @@ nav:
     - 课程笔记:
       - computer_science/ADS/lecture/index.md
       - AVL 与 Splay: computer_science/ADS/lecture/AVL_Splay/index.md
+      - 红黑树与 B+ 树: computer_science/ADS/lecture/RBtree_Bplus/index.md
 - 思政类课程:
   - political/index.md
   - 思想道德与法治: 
